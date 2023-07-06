@@ -1,0 +1,87 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+
+{% block title %}
+{% load static %}
+{% endblock title %}
+
+
+{% block content %}
+    {% autoescape off %}
+
+    {% if anno_detail %}
+    <table align="center" width="1200">
+            <tr>
+                 <td><h2>{{ anno_detail.title }}</h2></td>
+            </tr>
+            <tr>
+                <td><h5>{{ anno_detail.dateCreation|date:' d M Y' }}</h5></td>
+            </tr>
+
+            <tr>
+                <td><h3>{{ anno_detail.author}}</h3></td>
+            </tr>
+
+            <tr>
+                <td><h3>{{ anno_detail.text }}</h3></td>
+            </tr>
+
+
+    </table>
+    {% endif %}
+    {% endautoescape %}
+
+
+    {% if replies_to_this_anno %}
+        <h1>Отклики к объявлению</h1>
+        <h3>Всего откликов: {{ replies_to_this_anno|length }}</h3>
+        <hr>
+        <table align="center" width="1200">
+            <tr>
+                <tr>
+                    <td>Описание</td>
+                    <td>Дата публикации</td>
+                    <td>Автор отклика</td>
+                    <td>Публикация</td>
+                </tr>
+
+                    {% for response in replies_to_this_anno %}
+
+                        <tr>
+
+                            <td>{{ response.text }}</td>
+                            <td>{{ response.dateCreation|date:' d M Y' }}</td>
+                            <td>{{ response.author }}</td>
+                            <td>{{ response.status }}</td>
+                            <td>
+                            {% if request.user == response.author and perms.response.change_response %}
+                                <a href="{% url 'response_update' pk=response.id %}">Изменить</a>
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if request.user == response.author and perms.response.delete_response %}
+                                <a href="{% url 'response_delete' pk=response.id %}">Удалить</a>
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if request.user == anno_detail.author %}
+                                <a class="btn btn-success" href="{% url 'accept_response' pk=anno_detail.id id=response.id %}">Accept</a>
+                                <a class="btn btn-danger" href="{% url 'cancel_response' pk=anno_detail.id id=response.id %}">Cancel</a>
+                            {% endif %}
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+        </table>
+    {% else %}
+        <h2>Откликов нет!</h2>
+    {% endif %}
+
+
+<hr>
+{% if request.user != anno_detail.author %}
+    <a href="{% url 'response_create' anno_detail.pk %}">Добавить отклик</a>
+{% endif %}
+
+{% endblock content %}

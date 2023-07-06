@@ -1,0 +1,43 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+<!-- Название у нас будет Product -->
+{% block title %}
+% load static %
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим сам товар, идентификатор которого был передан в url -->
+{% block content %}
+    {% autoescape off %}
+
+    {% if personal_area_detail %}
+        <table align="center" width="1200">
+            <tr>
+                 <td><h2>{{ personal_area_detail.title }}</h2></td>
+            </tr>
+            <tr>
+                <td><h5>{{ personal_area_detail.dateCreation|date:' d M Y' }}</h5></td>
+            </tr>
+
+            <tr>
+                <td><h3>{{ personal_area_detail.author}}</h3></td>
+            </tr>
+
+            <tr>
+                <td><h3>{{ personal_area_detail.text }}</h3></td>
+            </tr>
+            <tr>
+                <a class="btn btn-success" href="{% url 'accept_response' response_id=personal_area_detail.id %}">Accept</a>
+                <a class="btn btn-danger" href="{% url 'cancel_response' response_id=personal_area_detail.id %}">Cancel</a>
+            </tr>
+
+
+        </table>
+
+
+
+
+
+    {% endif %}
+
+    {% endautoescape %}
+{% endblock content %}

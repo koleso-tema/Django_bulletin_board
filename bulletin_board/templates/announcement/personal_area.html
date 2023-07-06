@@ -1,0 +1,72 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+{% block title %}
+{{ Title }}
+{% endblock title %}
+
+
+{% block content %}
+{% load static %}
+    {% autoescape off %}
+
+    {% if perms.announcement.add_announcement %}
+            <a href="{% url 'anno_create' %}">Добавить объявление</a>
+        {% endif %}
+
+    {% if personal_area %}
+        <h1>Мои объявления</h1>
+        <h3>Всего объявлений: {{ personal_area|length }}</h3>
+
+        <form action="" method="get" >
+            {{ filterset.form.as_p }}
+            <input type="submit" class="mt-3 btn-primary" value="Найти" />
+        </form>
+        <hr>
+
+
+
+        <table align="center" width="1200">
+            <tr>
+                <tr>
+                    <td>Заголовок</td>
+                    <td>Описание</td>
+                    <td>Дата объявления</td>
+                    <td>Автор объявления</td>
+                    <td>Категория</td>
+                    {% if perms.announcement.change_announcement or perms.announcement.delete_announcement %}
+                        <td>Действия</td>
+                    {% endif %}
+
+
+
+                </tr>
+                {% for area in personal_area %}
+                    <tr>
+                        <td>{{ area.title }}</td>
+                        <td>{{ area.text }}</td>
+                        <td>{{ area.dateCreation|date:' d M Y' }}</td>
+                        <td>{{ area.author }}</td>
+                        <td>{{ area.category }}</td>
+                        <td>
+                            {% if request.user == area.author and perms.announcement.change_announcement %}
+                                <a href="{% url 'anno_update' pk=area.id %}">Изменить</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {# А здесь доступ для каждой ссылки теперь будем проверять отдельно #}
+                            {% if request.user == area.author and perms.announcement.delete_announcement %}
+                                <a href="{% url 'anno_delete' pk=area.id %}">Удалить</a>
+                            {% endif %}
+                        </td>
+                        <td><a href="{{ area.get_absolute_url }}">Смотреть объявление</a></td>
+                    </tr>
+                {% endfor %}
+
+
+        </table>
+
+    {% else %}
+        <h2>Объявлений нет!</h2>
+    {% endif %}
+    {% endautoescape %}
+{% endblock content %}
